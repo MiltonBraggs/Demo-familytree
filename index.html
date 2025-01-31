@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Draggable Family Tree</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+     
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #tree {
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+      
+      
+      
+
+    #svg-container {
+    width: 100%;
+    height: 80vh;
+    border-top: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto; /* Enable scrolling if needed */
+    cursor: grab;
+    position: absolute;
+    left: 0;
+    background-color: yellow;
+    overflow: hidden;
+    }
+
+    
+  
+
+
+    svg {
+      width: 100%;
+      height: 100%;
+      margin-top: 0;
+    }
+
+    path {
+      fill: none;
+      stroke: rgba(134, 128, 128, 0.37);
+      stroke-width: 10px;
+    }
+
+    text {
+      dominant-baseline: middle;
+      text-anchor: middle;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Braggs Family</h1>
+  <div id="tree">
+    <div id="svg-container">
+      <!-- SVG will be inserted here -->
+    </div>
+  </div>
+
+  <script>
+    var width = 3000;
+    var height = 500;
+
+    // Create the main SVG container
+    var svg = d3.select("#svg-container").append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .call(d3.zoom().scaleExtent([0.5, 5]).on("zoom", zoomed)) // Enable zoom
+        .append("g");
+
+    // Append a group element inside SVG for transformations
+    var g = svg.append("g")
+        .attr("transform", "translate(-1800,-100) scale(2.5)");
+    
+        
+
+    // Updated data with unique IDs
+    var data = [
+  { "id": "1", "child": "Emmanuel", "parent": "" },
+  
+  { "id": "2", "child": "Philip", "parent": "1" },
+  { "id": "3", "child": "Paul", "parent": "1" },
+  { "id": "4", "child": "John", "parent": "1" },
+  { "id": "5", "child": "James", "parent": "1" },
+  
+  { "id": "6", "child": "Antony", "parent": "2" },
+  { "id": "7", "child": "Alex", "parent": "2" },
+  { "id": "8", "child": "Dominic", "parent": "2" },
+  { "id": "9", "child": "Peter", "parent": "3" },
+  { "id": "10", "child": "Sebastian", "parent": "3" },
+  { "id": "11", "child": "Emmanuel", "parent": "3" },
+  { "id": "12", "child": "Xavier", "parent": "4" },
+  { "id": "13", "child": "Philip", "parent": "4" },
+  { "id": "14", "child": "James", "parent": "4" },
+  { "id": "15", "child": "Gabriel", "parent": "5" },
+  { "id": "16", "child": "Paul", "parent": "5" },
+  { "id": "17", "child": "Sebastian", "parent": "5" },
+  { "id": "18", "child": "John", "parent": "5" },
+  
+  { "id": "19", "child": "Francis", "parent": "6" },
+  { "id": "20", "child": "Thomas", "parent": "6" },
+  { "id": "21", "child": "Philip", "parent": "7" },
+  { "id": "22", "child": "Philip", "parent": "8" },
+  { "id": "23", "child": "Joseph", "parent": "8" },
+  { "id": "24", "child": "Luke", "parent": "8" },
+  { "id": "25", "child": "George", "parent": "8" },
+  { "id": "26", "child": "Andrew", "parent": "10" },
+  { "id": "27", "child": "Paul", "parent": "10" },
+  { "id": "28", "child": "Lawrence", "parent": "11" },
+  { "id": "29", "child": "George", "parent": "11" },
+  { "id": "30", "child": "Philip", "parent": "11" },
+  { "id": "31", "child": "Thomas", "parent": "12" },
+  { "id": "32", "child": "Custodis", "parent": "12" },
+  { "id": "33", "child": "Francis", "parent": "12" },
+  { "id": "34", "child": "Felix", "parent": "13" },
+  { "id": "35", "child": "Emmanuel", "parent": "13" },
+  { "id": "36", "child": "Louis", "parent": "13" },
+  { "id": "37", "child": "Paschal", "parent": "14" },
+  { "id": "38", "child": "Joseph", "parent": "14" },
+  { "id": "39", "child": "Joseph Baptist", "parent": "15" },
+  { "id": "40", "child": "Antony", "parent": "16" },
+  { "id": "41", "child": "Lawrence", "parent": "16" },
+  { "id": "42", "child": "Justine", "parent": "17" },
+  { "id": "43", "child": "Faustine", "parent": "17" },
+  { "id": "44", "child": "Constantine", "parent": "17" },
+  { "id": "45", "child": "Stephen", "parent": "18" },
+  { "id": "46", "child": "Joseph Antony", "parent": "18" },
+
+
+  { "id": "47", "child": "Antony", "parent": "19" },
+  { "id": "48", "child": "Isac", "parent": "20" },
+  { "id": "49", "child": "Paschal", "parent": "21" },
+  { "id": "50", "child": "Martin", "parent": "22" },
+  { "id": "51", "child": "Paul", "parent": "22" },
+  { "id": "52", "child": "Andrew", "parent": "23" },
+  { "id": "53", "child": "Peter", "parent": "25" },
+  { "id": "54", "child": "Joseph", "parent": "26" },
+  { "id": "55", "child": "Thomas", "parent": "26" },
+  { "id": "56", "child": "Xavier", "parent": "26" },
+  { "id": "57", "child": "Joachim", "parent": "26" },
+  { "id": "58", "child": "Xavier", "parent": "32" },
+  { "id": "59", "child": "Philip", "parent": "34" },
+  { "id": "60", "child": "Peter", "parent": "35" },
+  { "id": "61", "child": "Philip", "parent": "36" },
+  { "id": "62", "child": "John", "parent": "37" },
+  { "id": "63", "child": "Michael", "parent": "37" },
+  { "id": "64", "child": "Emmanuel", "parent": "38" },
+  { "id": "65", "child": "Rosario", "parent": "39" },
+  { "id": "66", "child": "Joseph", "parent": "40" },
+  { "id": "67", "child": "Baptist", "parent": "41" },
+  { "id": "68", "child": "Babi", "parent": "41" },
+  { "id": "69", "child": "Sebastian", "parent": "42" },
+  { "id": "70", "child": "Paschal", "parent": "43" },
+  { "id": "71", "child": "Seraphin", "parent": "43" },
+  { "id": "72", "child": "Alexis", "parent": "43" },
+  { "id": "73", "child": "Xavier", "parent": "44" },
+  { "id": "74", "child": "Rosario", "parent": "45" },
+  { "id": "75", "child": "John Peter", "parent": "45" },
+  { "id": "76", "child": "Januvarius", "parent": "45" },
+  { "id": "77", "child": "John", "parent": "46" }
+]
+;
+
+    // Stratify using the unique "id"
+    var dataStructure = d3.stratify()
+        .id(d => d.id)  // Unique ID
+        .parentId(d => d.parent)
+        (data);
+
+        var treeStructure = d3.tree().size([width - 100, height - 100]);
+ 
+
+    var information = treeStructure(dataStructure);
+
+    var connections = g.append("g").selectAll("path")
+        .data(information.links());
+    connections.enter().append("path")
+        .attr("d", function(d) {
+          return "M" + d.source.x + "," + d.source.y + " v 50 H" + d.target.x + " V " + d.target.y;
+        });
+
+    /*var rectangles = g.append("g").selectAll("rect")
+        .data(information.descendants());
+    rectangles.enter().append("rect")
+        .attr("x", d => d.x - 40)
+        .attr("y", d => d.y - 20)
+        .attr("rx", 10) 
+        .attr("ry", 10) 
+        .attr("width", 80)
+        .attr("height", 40)
+        .style("fill", "yellow")
+        .style("stroke", "black");*/
+
+    var names = g.append("g").selectAll("text")
+        .data(information.descendants());
+    names.enter().append("text")
+        .text(d => d.data.child) // Uses "child" for display
+        .attr("x", d => d.data.id >= 47 ? d.x + 25 : d.x)
+        .attr("y", d => d.y) // Add 4px for IDs 47+
+        .attr("transform", d => d.data.id >= 47 ? `rotate(90, ${d.x}, ${d.y})` : "")
+        
+        .style("font-size", "12px")
+        .style("font-weight", "bold");
+
+
+
+        function zoomed() {
+      g.attr("transform", d3.event.transform + "translate(-1800,-100)  scale(2.5)");
+      
+    }
+
+    
+
+   
+
+   
+
+   
+
+
+  </script>
+</body>
+</html>
